@@ -1,0 +1,42 @@
+<script>
+window.SummonBehavior = (function() {
+    "use strict";
+
+    var elements = [];
+
+    function summon(e) {
+        var d = e.detail;
+        var summoned = false;
+
+        for (var i = 0, el; i < elements.length; i++) {
+            el = elements[i];
+            if (
+                (!e.element || el.is === e.element) &&
+                el.can(d.intent, d.opts) &&
+                (summoned = el.summon(d.opts))
+            ) {
+                break;
+            }
+        }
+
+        if (typeof d.summoned === "function") {
+            d.summoned(summoned);
+        }
+    }
+
+    document.addEventListener("summon", summon, true);
+
+    return {
+        created: function() {
+            elements.push(this);
+        },
+        can: function(intent, opts) {
+            return true;
+        },
+        summon: function(opts) {
+            return true;
+        }
+    };
+
+})();
+</script>
