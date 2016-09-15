@@ -1,0 +1,13 @@
+{
+    "eslint": {
+        "files": ["**/*.{js,html}"]
+    },
+    "inflint": {
+        "files": ["**/*.html"],
+        "excludes": ["bower_components/**/*", "node_modules/**/*", "deploy/**/*", "demo/**/*"]
+    },
+    "polylint": {
+        "files": ["**/*.{html,js}"],
+        "excludes": ["bower_components/**/*", "node_modules/**/*", "deploy/**/*"]
+    }
+}
