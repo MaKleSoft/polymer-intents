@@ -1,0 +1,121 @@
+<!doctype html>
+<html>
+  <head>
+    <title>summon-behavior demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../polymer/polymer.html">
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+
+    <link rel="import" href="../summon-behavior.html">
+    <link rel="import" href="spinner.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </head>
+  <body>
+
+    <h3>summon-behavior Demo</h3>
+    <demo-snippet>
+        <template>
+            <dom-module id="demo-spinner">
+                <template>
+                    <div>Hi, I'm a spinner! {{ _spinCount }} elements are loading right now.</div>
+                </template>
+                <script>
+                /* global Polymer, SummonBehavior */
+                (function() {
+                    "use strict";
+
+                    Polymer({
+                        is: "demo-spinner",
+                        behaviors: [
+                            SummonBehavior
+                        ],
+                        properties: {
+                            _spinCount: {
+                                type: Number,
+                                value: 0,
+                                observer: "_spinCountChanged"
+                            }
+                        },
+                        can: function(intent) {
+                            return intent == "loading-indicator";
+                        },
+                        summon: function() {
+                            this._spinCount++;
+                            var self = this;
+                            return (function() {
+                                var stopped = false;
+
+                                return function() {
+                                    if (!stopped) {
+                                        self._spinCount = Math.max(self._spinCount - 1, 0);
+                                        stopped = true;
+                                    }
+                                };
+                            })();
+                        },
+                        _spinCountChanged: function() {
+                            this.style.display = this._spinCount ? "" : "none";
+                        }
+                    });
+
+                })();
+                </script>
+            </dom-module>
+
+            <dom-module id="demo-element">
+                <template>
+                    <template is="dom-if" if="{{ !_spinning }}">
+                        <button on-tap="startSpinner">Start Spinner</button>
+                    </template>
+                    <template is="dom-if" if="{{ _spinning }}">
+                        <button on-tap="stopSpinner">Stop Spinner</button>
+                    </template>
+                </template>
+                <script>
+                    /* global Polymer */
+                    (function() {
+                        "use strict";
+                        Polymer({
+                            is: "demo-element",
+                            properties: {
+                                _spinning: {
+                                    type: Boolean,
+                                    value: false
+                                }
+                            },
+                            startSpinner: function() {
+                                this.fire("summon", {
+                                    "intent": "loading-indicator",
+                                    summoned: function(stop) {
+                                        if (stop) {
+                                            this._spinning = true;
+                                            this._stopSpinner = stop;
+                                        }
+                                    }.bind(this)
+                                });
+                            },
+                            stopSpinner: function() {
+                                this._stopSpinner();
+                                this._spinning = false;
+                            }
+                        });
+                    })();
+                </script>
+            </dom-module>
+
+            <demo-spinner></demo-spinner>
+
+            <demo-element></demo-element>
+            <demo-element></demo-element>
+        </template>
+    </demo-snippet>
+
+  </body>
+</html>
