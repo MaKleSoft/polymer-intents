@@ -1,6 +1,7 @@
 {
   "name": "summon-behavior",
   "main": "summon-behavior.html",
+  "version": "0.0.0",
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0"
   },
