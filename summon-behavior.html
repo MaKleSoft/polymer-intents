@@ -1,41 +1,46 @@
 <script>
-window.SummonBehavior = (function() {
+window.intents = (function() {
     "use strict";
 
-    var elements = [];
+    var providers = [];
 
-    function summon(e) {
-        var d = e.detail;
-        var summoned = false;
+    function request(action) {
+        var performed = false;
 
-        for (var i = 0, el; i < elements.length; i++) {
-            el = elements[i];
+        for (var i = 0, p; i < providers.length; i++) {
+            p = providers[i];
             if (
-                (!e.element || el.is === e.element) &&
-                el.can(d.intent, d.opts) &&
-                (summoned = el.summon(d.opts))
+                p.canProvide(action) &&
+                (performed = p.performAction(action))
             ) {
                 break;
             }
         }
 
-        if (typeof d.summoned === "function") {
-            d.summoned(summoned);
-        }
+        return performed;
     }
 
-    document.addEventListener("summon", summon, true);
-
-    return {
+    var Provider = {
         created: function() {
-            elements.push(this);
+            providers.push(this);
         },
-        can: function(/* intent, opts */) {
+        canProvide: function(/* action */) {
             return true;
         },
-        summon: function(/* opts */) {
+        performAction: function(/* action */) {
             return true;
         }
+    };
+
+    var Consumer = {
+        requestAction: function(action) {
+            return request(action);
+        }
+    };
+
+    return {
+        Provider: Provider,
+        Consumer: Consumer
     };
 
 })();
