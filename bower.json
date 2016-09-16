@@ -1,7 +1,11 @@
 {
-  "name": "summon-behavior",
-  "main": "summon-behavior.html",
+  "name": "polymer-intents",
+  "main": "polymer-intents.html",
   "version": "0.0.1",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/maklesoft/polymer-intents.git"
+  },
   "dependencies": {
     "polymer": "Polymer/polymer#^1.4.0"
   },
