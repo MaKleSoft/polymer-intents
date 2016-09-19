@@ -1,0 +1,47 @@
+<script>
+window.intents = (function() {
+    "use strict";
+
+    var providers = [];
+
+    function request(action) {
+        var performed = false;
+
+        for (var i = 0, p; i < providers.length; i++) {
+            p = providers[i];
+            if (
+                p.canProvide(action) &&
+                (performed = p.performAction(action))
+            ) {
+                break;
+            }
+        }
+
+        return performed;
+    }
+
+    var Provider = {
+        created: function() {
+            providers.push(this);
+        },
+        canProvide: function(/* action */) {
+            return true;
+        },
+        performAction: function(/* action */) {
+            return true;
+        }
+    };
+
+    var Consumer = {
+        requestAction: function(action) {
+            return request(action);
+        }
+    };
+
+    return {
+        Provider: Provider,
+        Consumer: Consumer
+    };
+
+})();
+</script>

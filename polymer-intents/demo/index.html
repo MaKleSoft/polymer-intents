@@ -1,0 +1,131 @@
+<!doctype html>
+<html>
+  <head>
+    <title>polymer-intents demo</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, initial-scale=1, user-scalable=yes">
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+    <link rel="import" href="../../polymer/polymer.html">
+
+    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+
+    <link rel="import" href="../polymer-intents.html">
+
+    <style is="custom-style" include="demo-pages-shared-styles">
+    </style>
+  </head>
+  <body>
+
+    <h3>polymer-intents Demo</h3>
+    <demo-snippet>
+        <template>
+
+            <dom-module id="demo-spinner">
+                <template>
+                    <div>Hi, I'm a spinner! {{ _spinCount }} elements are loading right now.</div>
+                </template>
+                <script>
+                /* global Polymer, intents */
+                (function() {
+                    "use strict";
+
+                    Polymer({
+                        is: "demo-spinner",
+                        behaviors: [
+                            intents.Provider
+                        ],
+                        properties: {
+                            _spinCount: {
+                                type: Number,
+                                value: 0,
+                                observer: "_spinCountChanged"
+                            }
+                        },
+                        canProvide: function(action) {
+                            return action.intent == "loading-indicator";
+                        },
+                        performAction: function() {
+                            this._spinCount++;
+                            var self = this;
+                            return (function() {
+                                var stopped = false;
+
+                                return function() {
+                                    if (!stopped) {
+                                        self._spinCount = Math.max(self._spinCount - 1, 0);
+                                        stopped = true;
+                                    }
+                                };
+                            })();
+                        },
+                        _spinCountChanged: function() {
+                            this.style.display = this._spinCount ? "" : "none";
+                        }
+                    });
+
+                })();
+                </script>
+            </dom-module>
+
+            <script>
+                window.LoadingBehavior = (function() {
+                    "use strict";
+                    return [
+                        intents.Consumer,
+                        {
+                            properties: {
+                                loading: {
+                                    type: Boolean,
+                                    value: false,
+                                    observer: "_loadingChanged"
+                                }
+                            },
+                            _loadingChanged: function() {
+                                if (this.loading) {
+                                    this._stopLoading = this.requestAction({
+                                        intent: "loading-indicator"
+                                    });
+                                } else {
+                                    this._stopLoading && this._stopLoading();
+                                }
+                            }
+                        }
+                    ];
+                })();
+            </script>
+
+            <dom-module id="demo-element">
+                <template>
+                    <button on-tap="_toggleLoading">{{ _buttonLabel(loading) }}</button>
+                </template>
+                <script>
+                    /* global Polymer, LoadingBehavior */
+                    (function() {
+                        "use strict";
+                        Polymer({
+                            is: "demo-element",
+                            behaviors: [
+                                LoadingBehavior
+                            ],
+                            _buttonLabel: function(loading) {
+                                return loading ? "Start Loading" : "Stop Loading";
+                            },
+                            _toggleLoading: function() {
+                                this.loading = !this.loading;
+                            }
+                        });
+                    })();
+                </script>
+            </dom-module>
+
+            <demo-spinner></demo-spinner>
+
+            <demo-element></demo-element>
+            <demo-element></demo-element>
+        </template>
+    </demo-snippet>
+
+  </body>
+</html>
