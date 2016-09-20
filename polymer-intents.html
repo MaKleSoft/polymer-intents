@@ -4,6 +4,10 @@ window.intents = (function() {
 
     var providers = [];
 
+    function register(provider) {
+        providers.push(provider);
+    }
+
     function request(action) {
         var performed = false;
 
@@ -39,6 +43,8 @@ window.intents = (function() {
     };
 
     return {
+        register: register,
+        request: request,
         Provider: Provider,
         Consumer: Consumer
     };
